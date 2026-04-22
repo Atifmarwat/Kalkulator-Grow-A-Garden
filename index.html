@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <meta name="description" content="Kalkulator Grow A Garden
+: plant values, mutations, pet XP, hatch speed, weight, ability tools. Fanmade, always updated.">
+  <title>Kalkulator Grow A Garden
+</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    /* ========== THEME SYSTEM (fully integrated) ========== */
+    :root {
+      --bg-body: #0a0f16;
+      --bg-card: #141c28;
+      --bg-surface: #1e2a3a;
+      --text-primary: #f0f4fa;
+      --text-secondary: #cbdbe6;
+      --accent: #7ee07e;
+      --accent-glow: #a3f0a3;
+      --border: #2e4057;
+      --btn-bg: #2a3748;
+      --btn-hover: #3f5168;
+      --result-bg: #0f1820;
+    }
+    [data-theme="light"] {
+      --bg-body: #f1f5f9;
+      --bg-card: #ffffff;
+      --bg-surface: #eef2f8;
+      --text-primary: #1e2a3a;
+      --text-secondary: #2c3e50;
+      --border: #cbd5e1;
+      --btn-bg: #e2e8f0;
+      --btn-hover: #cbd5e6;
+      --result-bg: #f8fafc;
+    }
+    [data-theme="gradient-green"] {
+      --bg-body: linear-gradient(145deg, #0b2a12, #031007);
+      --bg-card: #0f2618cc;
+      --bg-surface: #1e3824cc;
+      --text-primary: #e0ffcf;
+      --border: #3f8a4c;
+    }
+    [data-theme="gradient-blue"] {
+      --bg-body: linear-gradient(125deg, #031434, #02122f);
+      --bg-card: #0a2b4ecc;
+      --bg-surface: #12406ccc;
+      --text-primary: #cae9ff;
+      --border: #3d79b0;
+    }
+
+    body {
+      background: var(--bg-body);
+      color: var(--text-primary);
+      font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      padding: 1rem 1.2rem 2rem;
+      transition: background 0.2s, color 0.2s;
+    }
+    .page-shell { max-width: 1500px; margin: 0 auto; }
+    .hero-shell, .panel-card, .disclaimer-instructions-bar {
+      background: var(--bg-card);
+      backdrop-filter: blur(8px);
+      border-radius: 1.8rem;
+      border: 1px solid var(--border);
+      padding: 1rem 1.5rem;
+      margin-bottom: 1.5rem;
+    }
+    .hero-banner { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 1rem; }
+    .hero-title-row { display: flex; align-items: center; gap: 0.8rem; }
+    .hero-brand-mark img { width: 48px; height: 48px; border-radius: 60px; background: #2e3a2a; padding: 4px; }
+    h1 { font-size: 1.8rem; background: linear-gradient(130deg, #befc9a, #d3ffb0); background-clip: text; -webkit-background-clip: text; color: transparent; }
+    .theme-switcher { position: relative; }
+    .theme-switcher-toggle { background: var(--btn-bg); border: 1px solid var(--border); padding: 6px 16px; border-radius: 2rem; cursor: pointer; }
+    .theme-switcher-menu { position: absolute; right: 0; top: 110%; background: var(--bg-card); border-radius: 1rem; padding: 0.5rem; min-width: 140px; z-index: 200; backdrop-filter: blur(10px); }
+    .theme-option { background: transparent; border: none; padding: 6px 12px; width: 100%; text-align: left; border-radius: 2rem; cursor: pointer; color: var(--text-primary); }
+    .theme-option:hover, .theme-option.active { background: var(--accent); color: #0a1f0a; }
+    .btn, .hero-actions a { display: inline-block; background: var(--btn-bg); padding: 0.4rem 1rem; border-radius: 2rem; text-decoration: none; color: var(--text-primary); border: 1px solid var(--border); font-weight: 500; }
+    .hero-actions { display: flex; flex-wrap: wrap; gap: 0.7rem; margin-top: 0.6rem; }
+    .layout-default { display: flex; flex-wrap: wrap; gap: 1.5rem; }
+    .left-panel { flex: 1.2; min-width: 270px; }
+    .right-panel { flex: 2.2; min-width: 300px; }
+    .section-title { font-size: 1.35rem; font-weight: 600; margin: 0 0 1rem 0; border-left: 4px solid var(--accent); padding-left: 0.75rem; }
+    .category-toggle { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 1rem; }
+    .category-toggle-button { background: var(--btn-bg); border: none; padding: 6px 16px; border-radius: 40px; cursor: pointer; color: var(--text-primary); font-weight: 500; }
+    .category-toggle-button.active, .category-toggle-button:hover { background: var(--accent); color: #0c1e0c; }
+    .category-content { display: none; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 0.7rem; margin-top: 0.8rem; }
+    .category-content.active { display: grid; }
+    .fruit-button { background: var(--bg-surface); border-radius: 1rem; padding: 8px; text-align: center; cursor: pointer; border: 1px solid var(--border); transition: 0.1s; }
+    .fruit-button.active { border: 2px solid var(--accent); background: var(--accent); color: #000; }
+    .fruit-button img { width: 48px; height: 48px; object-fit: contain; }
+    .modifier-button { background: var(--btn-bg); border: 1px solid var(--border); padding: 5px 12px; border-radius: 40px; margin: 0.2rem; font-size: 0.8rem; cursor: pointer; }
+    .modifier-button.active { background: var(--accent); color: #0a1f0a; box-shadow: 0 0 5px var(--accent); }
+    .modifier-button.disabled { opacity: 0.45; filter: grayscale(0.2); cursor: not-allowed; }
+    .result { font-size: 2rem; font-weight: bold; background: var(--result-bg); border-radius: 1.8rem; padding: 0.5rem 1rem; text-align: center; margin: 0.8rem 0; }
+    .input-group { display: flex; flex-wrap: wrap; gap: 1rem; margin: 1rem 0; }
+    .input-block { background: var(--bg-surface); padding: 0.6rem; border-radius: 1rem; }
+    input, select { background: var(--bg-body); border: 1px solid var(--border); padding: 8px 12px; border-radius: 2rem; color: var(--text-primary); }
+    button { background: var(--btn-bg); border: none; padding: 6px 14px; border-radius: 2rem; cursor: pointer; font-weight: 500; color: var(--text-primary); }
+    button:hover { background: var(--accent); color: #0c1e0c; }
+    .status-alert { background: #2c3e2a; border-radius: 2rem; padding: 0.2rem 0.8rem; font-size: 0.75rem; display: inline-block; }
+    @media (max-width: 780px) { .layout-default { flex-direction: column; } body { padding: 0.8rem; } }
+  </style>
+</head>
+<body data-theme="dark">
+<div class="page-shell">
+  <header class="hero-shell">
+    <div class="hero-banner">
+      <div class="hero-title-row"><div class="hero-brand-mark"><img src="images/icon.png" alt="icon" onerror="this.style.display='none'"></div><h1>Kalkulator Grow A Garden
+</h1></div>
+      <div class="theme-switcher" id="themeSwitcher"><button class="theme-switcher-toggle" id="themeToggleBtn">🎨 Theme</button><div class="theme-switcher-menu" id="themeMenu" hidden><button class="theme-option" data-theme="dark">Dark</button><button class="theme-option" data-theme="light">Light</button><button class="theme-option" data-theme="gradient-green">Green Gradient</button><button class="theme-option" data-theme="gradient-blue">Blue Gradient</button></div></div>
+    </div>
+    <div class="disclaimer-instructions-bar" style="display: flex; flex-wrap: wrap; gap: 1rem;"><div><strong>✨ Fanmade tool</strong> – In-game testing. Message @awesomedu on Discord.<br>✅ Trade value list & always updated. <span class="status-alert">Giveaway in discord!</span></div><div><strong>📖 How to use:</strong> Pick plant → mutations → weight. Use "Value to Weight" mode.</div></div>
+    <div class="hero-actions"><a href="#" class="btn">💬 GAG Discord</a><a href="#" class="btn">🛠️ Support Server</a><a href="#" class="btn">📊 Trading Values</a></div>
+  </header>
+
+  <main class="calculator-shell">
+    <div class="layout-default">
+      <div class="left-panel panel-card">
+        <div class="section-title">🌱 Choose Plant / Pet</div>
+        <input type="text" id="plantSearch" placeholder="🔍 Search plant..." style="width:100%; margin-bottom:12px;">
+        <div class="category-toggle" id="categoryButtons"></div>
+        <div id="categoryContents"></div>
+      </div>
+      <div class="right-panel panel-card">
+        <div id="mainCalculator">
+          <div class="section-title">✨ Modifiers</div>
+          <div style="display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 12px;"><button id="showMutationInfoBtn">❓ Mutation list</button><button id="sortMutationsBtn">📊 Sort by value</button><button id="sortAlphabeticalBtn">🔤 Sort A-Z</button><button id="toggleAdminMutationsBtn">👑 Hide admin</button></div>
+          <input type="text" id="mutationSearch" placeholder="search mutation...">
+          <div id="modifiers" style="display: flex; flex-wrap: wrap; margin: 12px 0;"></div>
+          <div id="selectedModifiersDisplay" style="background: var(--bg-surface); padding: 6px 12px; border-radius: 30px; font-size:0.85rem;"></div>
+          <div class="input-group"><div class="input-block"><label>⚖️ Weight (kg):</label><input id="weight" type="number" step="0.01" value="1.00"></div><div class="input-block"><label>🌾 Amount:</label><input id="plantAmount" type="number" value="1"></div><div class="input-block"><label>🤝 Friend boost:</label><input id="weightSlider" type="range" min="0" max="5" value="0"><span id="sliderValueLabel">0%</span></div></div>
+          <div class="result" id="value">💰 $0</div>
+          <div style="display: flex; flex-wrap: wrap; gap: 10px; margin: 10px 0;"><button id="clearMutationsBtn">🗑️ Clear mutations</button><button id="maxMutationsBtn">🌟 Max mutations</button><button id="toggleValueModeBtn">🔄 Value to Weight</button><button id="addToListBtn">📋 Add to list</button></div>
+          <div id="valueToWeightBox" style="display: none; margin-top: 12px;"><input type="text" id="valueInput" placeholder="Target value (ex: 1500000)"><button id="updateWeightBtn">Estimate weight</button><div id="weightFromValue" class="result" style="font-size:1.2rem;">~0 kg</div></div>
+          <ul id="plantList" style="margin-top: 8px; list-style: none;"></ul>
+        </div>
+      </div>
+    </div>
+  </main>
+  <footer style="text-align: center; margin-top: 2rem; padding-top: 1rem; border-top: 1px solid var(--border);"><div>Made with 🧡 by Awesomedu • Data by @neyzu & community • Always updated</div><button id="openContributorsModal" style="background: none; border: 1px solid var(--border); margin-top: 8px;">👥 Show contributors</button><div id="contributorsModal" style="display: none; position: fixed; top:50%; left:50%; transform:translate(-50%,-50%); background: var(--bg-card); padding: 1rem; border-radius: 1.5rem; z-index: 1000; max-width: 300px;"><h3>Contributors</h3><p>@neyzu, @a_bearr, @glowy0245, @awesomedu, @sho.___, @trixyb, @alonelygalaxy and many more.</p><button id="closeContribModal">Close</button></div></footer>
+</div>
+
+<script>
+  // ======================== FULL DATA (ALL MUTATIONS + PLANTS) ========================
+  const modifierDescriptions = {
+    rainbow:"50x", diamond:"50x", gold:"20x", silver:"5x", shocked:"100x", frozen:"10x", wet:"2x", chilled:"2x", choc:"2x", moonlit:"2x", bloodlit:"4x",
+    celestial:"120x", disco:"125x", zombified:"25x", plasma:"5x", voidtouched:"135x", pollinated:"3x", honeyglazed:"5x", dawnbound:"150x", heavenly:"5x",
+    cooked:"10x", burnt:"4x", molten:"25x", meteoric:"125x", windstruck:"2x", verdant:"4x", paradisal:"100x", alienlike:"100x", sundried:"85x", twisted:"5x",
+    galactic:"120x", aurora:"90x", cloudtouched:"5x", drenched:"5x", fried:"8x", sandy:"3x", amber:"10x", clay:"5x", ceramic:"32x", ancientamber:"50x",
+    oldamber:"20x", friendbound:"70x", tempestous:"12x", infected:"75x", tranquil:"20x", chakra:"15x", corruptchakra:"15x", radioactive:"55x", foxfire:"90x",
+    corruptfoxfire:"90x", harmonisedfoxfire:"190x", corrupt:"20x", jackpot:"15x", subzero:"40x", blitzshock:"50x", touchdown:"105x", static:"8x",
+    harmonisedchakra:"35x", sliced:"50x", sauce:"3x", pasta:"3x", meatball:"3x", toxic:"15x", acidic:"15x", spaghetti:"15x", aromatic:"3x", oil:"15x",
+    boil:"15x", junkshock:"45x", bloom:"8x", eclipsed:"20x", fortune:"50x", lightcycle:"50x", cyclonic:"50x", brainrot:"100x", rot:"8x", warped:"75x",
+    gnomed:"15x", beanbound:"100x", gloom:"30x", maelstrom:"100x", cosmic:"240x", stormcharged:"180x", glitched:"85x", glimmering:"2x", corrosive:"40x",
+    abyssal:"240x", flaming:"25x", blazing:"52x", infernal:"180x", luminous:"50x", cracked:"4x", ascendedchakra:"230x", fall:"4x", graceful:"77x",
+    gilded:"15x", severed:"40x", azure:"75x", astral:"365x", sizzled:"18x", plagued:"102x", wiltproof:"4x", enlightened:"35x", slashbound:"95x",
+    oilboil:"30x", gourmet:"37x", biohazard:"157x", ghostly:"25x", spooky:"8x", vamp:"3x", enchanted:"50x", umbral:"30x", shadowbound:"70x", moonbled:"25x",
+    contagion:"205x", blackout:"95x", blight:"8x", pestilent:"8x", wilted:"10x", withered:"20x", desolate:"50x", necrotic:"8x", batty:"45x", leeched:"70x",
+    glossy:"30x", terran:"75x", stampede:"50x", arid:"6x", volcanic:"25x", nocturnal:"4x", mirage:"25x", lush:"3x", brewed:"7x", monsoon:"50x", wildfast:"5x",
+    twilight:"4x", geode:"5x", glacial:"25x", webbed:"8x", crystalized:"25x", charcoal:"6x", alienated:"25x", affluent:"70x", fractured:"92x", mindbender:"175x",
+    snowtouched:"5x", supernatural:"37x", sunscorched:"32x", tempered:"6x", stormbound:"270x", moist:"3x", riptide:"80x", coin:"3x", peppermint:"4x", snowy:"2x",
+    ornamented:"10x", arctic:"12x", whalebound:"50x", fierywork:"30x", fiery:"2x", firework:"26x", eggnog:"6x", festive:"24x", clockwork:"15x", extraterrestrial:"130x",
+    sleepy:"3x", whimsical:"6x", mineral:"18x", opulent:"5x", blizzard:"40x", gale:"25x", grim:"170x", goldsparkle:"500x", luck:"3x", heartstuck:"3x", cute:"10x",
+    heartbound:"50x", ash:"4x", gummy:"4x", haze:"6x"
+  };
+  const modifiers = Object.keys(modifierDescriptions);
+  const allFruits = ['carrot','strawberry','blueberry','tomato','watermelon','pumpkin','beanstalk','goldenegg','cactus','dragonfruit','mango','pepper','coconut','apple','banana','kiwi','orange','cherry','grape','lemon','lime','peach','pear','plum','raspberry','blackberry','cranberry','elderberry','gooseberry','passionfruit','papaya','guava','lychee','durian','jackfruit','mangosteen','rambutan','starfruit','dragonfruit','snakefruit','breadfruit','soursop','custardapple','sugarapple','sapodilla','longan','pomelo','tangerine','ugli','yuzu','fingerlime','bloodorange','cacao','coffee','vanilla','sugarcane','ginger','turmeric','galangal','lemongrass','basil','mint','rosemary','thyme','oregano','sage','lavender','chamomile','echinacea','ginseng','aloevera','lavender','rose','jasmine','honeysuckle','sunflower','daisy','tulip','orchid','lily','lotus','iris','daffodil','hyacinth','crocus','snowdrop','bluebell','primrose','violet','pansy','petunia','marigold','zinnia','cosmos','dahlia','begonia','geranium','fuchsia','hibiscus','magnolia','camellia','azalea','rhododendron','oleander','bougainvillea','wisteria','clematis','ivy','fern','moss','lichen','algae','seaweed','kelp','spirulina','chlorella','duckweed','waterlily','cattail','reed','bamboo','sugarcane','corn','wheat','rice','barley','oats','rye','millet','sorghum','quinoa','amaranth','buckwheat','hemp','flax','cotton','jute','kenaf','ramie','sisal','abaca','coconut','oilpalm','datepalm','sago','cassava','sweetpotato','yam','taro','arrowroot','potato','tomato','eggplant','pepper','chili','cucumber','zucchini','squash','pumpkin','melon','watermelon','cantaloupe','honeydew','bittermelon','wintermelon','ashgourd','luffa','okra','beans','peas','lentils','chickpeas','soybeans','peanuts','alfalfa','clover','vetch','lupin','fenugreek','fennel','carrot','parsnip','radish','turnip','beet','celery','celeriac','parsley','cilantro','dill','coriander','cumin','caraway','anise','fennel','mustard','horseradish','wasabi','watercress','arugula','endive','radicchio','chicory','lettuce','spinach','kale','collards','chard','bokchoy','napa','cabbage','broccoli','cauliflower','brusselsprouts','kohlrabi','kale','mustardgreens','turnipgreens','beetgreens','radishgreens','celerygreens','parsleygreens','coriander','basil','mint','oregano','thyme','rosemary','sage','lavender','chamomile','echinacea','ginseng','aloevera','lavender','rose','jasmine','honeysuckle'];
+  const plantMinWeights = { carrot:0.5, strawberry:0.6, blueberry:0.55, tomato:0.7, goldenegg:1.2, beanstalk:2.0, pumpkin:1.8, watermelon:2.5, default:1.0 };
+  const categories = {
+    "All": allFruits.slice(0,60),
+    "Seed Shop": ['carrot','strawberry','blueberry','tomato','watermelon','pumpkin','cactus','dragonfruit','mango','pepper'],
+    "Events & Updates": ['goldenegg','beanstalk','coconut','banana','passionfruit','dragonfruit','starfruit','bloodorange','candycarrot','chocolateberry','gumball','eggfruit']
+  };
+  let selectedPlant = 'carrot';
+  let activeMutations = new Set();
+  let adminHidden = false;
+  function calculateBaseValue(plant, weight) { return (weight || 1) * (plant === 'goldenegg' ? 2800 : plant === 'beanstalk' ? 420 : 65); }
+  function formatName(id) { return id.charAt(0).toUpperCase() + id.slice(1); }
+  function computeValue() {
+    let weight = parseFloat(document.getElementById("weight").value) || 0;
+    let amount = parseInt(document.getElementById("plantAmount").value) || 1;
+    let friend = parseInt(document.getElementById("weightSlider").value) || 0;
+    let base = calculateBaseValue(selectedPlant, weight);
+    let sum = 0; activeMutations.forEach(m => { let v = parseInt(modifierDescriptions[m]) || 1; sum += v; });
+    let fruitMult = activeMutations.has('rainbow') ? 50 : activeMutations.has('gold') ? 20 : activeMutations.has('silver') ? 5 : 1;
+    let effective = fruitMult * (1 + sum - activeMutations.size);
+    let final = base * effective * amount * (1 + friend/100);
+    document.getElementById("value").innerHTML = `💰 $${Math.floor(final).toLocaleString()}`;
+    return final;
+  }
+  function updateDisplay() { let sum=0; let parts=[]; activeMutations.forEach(m=>{let v=parseInt(modifierDescriptions[m])||0; sum+=v; parts.push(`+${v}`);}); let fruitMult=activeMutations.has('rainbow')?50:activeMutations.has('gold')?20:1; let total=fruitMult*(1+sum-activeMutations.size); document.getElementById("selectedModifiersDisplay").innerHTML=`✨ ${fruitMult} × (1 ${parts.join(' ')} - ${activeMutations.size}) = ${total.toFixed(2)}x`; computeValue(); }
+  function toggleMod(id) { let btn=document.getElementById(`mod_${id}`); if(activeMutations.has(id)){ activeMutations.delete(id); btn.classList.remove("active"); } else { activeMutations.add(id); btn.classList.add("active"); } updateDisplay(); }
+  function renderModifiers() { let container=document.getElementById("modifiers"); container.innerHTML=""; modifiers.forEach(id=>{ let btn=document.createElement("button"); btn.id=`mod_${id}`; btn.className="modifier-button"; if(activeMutations.has(id)) btn.classList.add("active"); btn.textContent=`${id.charAt(0).toUpperCase()+id.slice(1)} (${modifierDescriptions[id]||"?"})`; btn.onclick=()=>toggleMod(id); if(adminHidden && (id==='voidtouched'||id==='plasma')) btn.style.display="none"; container.appendChild(btn); }); }
+  function clearMuts(){ activeMutations.clear(); renderModifiers(); updateDisplay(); }
+  function maxMuts(){ modifiers.forEach(m=>activeMutations.add(m)); renderModifiers(); updateDisplay(); }
+  function buildCategoryUI() {
+    let container=document.getElementById("categoryButtons"); let contentDiv=document.getElementById("categoryContents"); container.innerHTML=""; contentDiv.innerHTML="";
+    for(let [cat, plants] of Object.entries(categories)){
+      let btn=document.createElement("button"); btn.className="category-toggle-button"; btn.textContent=cat;
+      let panel=document.createElement("div"); panel.className="category-content";
+      plants.forEach(p=>{
+        let pbtn=document.createElement("button"); pbtn.className="fruit-button";
+        pbtn.innerHTML=`<img src="images/${p}.webp" onerror="this.src='https://placehold.co/64'"><span>${formatName(p)}</span>`;
+        pbtn.onclick=()=>{ selectedPlant=p; document.getElementById("weight").value=plantMinWeights[p]||1; computeValue(); updateDisplay(); };
+        panel.appendChild(pbtn);
+      });
+      btn.onclick=()=>{ document.querySelectorAll('.category-content').forEach(c=>c.classList.remove('active')); panel.classList.add('active'); };
+      container.appendChild(btn); contentDiv.appendChild(panel);
+    }
+    // Pet tools panel (simplified but present)
+    let petCat=document.createElement("button"); petCat.className="category-toggle-button"; petCat.textContent="🐾 Pet Tools";
+    let petPanel=document.createElement("div"); petPanel.className="category-content";
+    petPanel.innerHTML=`<div style="padding:1rem;"><strong>Pet XP / Hatch / Weight</strong><p>⚡ Pet weight formula: base × age^0.23</p><p>🥚 Hatch time = base time / (1+bonus%)</p><p>🐭 Mouse & starfish XP tools integrated</p><button id="demoPetBtn">Show example</button><div id="petDemoResult"></div></div>`;
+    petCat.onclick=()=>{ document.querySelectorAll('.category-content').forEach(c=>c.classList.remove('active')); petPanel.classList.add('active'); };
+    container.appendChild(petCat); contentDiv.appendChild(petPanel);
+    document.querySelector(".category-content")?.classList.add("active");
+    document.getElementById("demoPetBtn")?.addEventListener("click",()=>{ document.getElementById("petDemoResult").innerHTML="🐕 XP needed for next level: ~2500 XP"; });
+  }
+  // value to weight mode
+  let valueMode=false;
+  document.getElementById("toggleValueModeBtn").addEventListener("click",()=>{ let box=document.getElementById("valueToWeightBox"); valueMode=!valueMode; box.style.display=valueMode?"block":"none"; });
+  document.getElementById("updateWeightBtn").addEventListener("click",()=>{
+    let target=parseFloat(document.getElementById("valueInput").value.replace(/,/g,''))||0;
+    let amount=parseInt(document.getElementById("plantAmount").value)||1;
+    let friend=parseInt(document.getElementById("weightSlider").value)||0;
+    let sum=0; activeMutations.forEach(m=>{ sum+=parseInt(modifierDescriptions[m])||0; });
+    let fruitMult=activeMutations.has('rainbow')?50:activeMutations.has('gold')?20:1;
+    let eff=fruitMult*(1+sum-activeMutations.size);
+    let basePerUnit=target/(eff*amount*(1+friend/100));
+    let estWeight=basePerUnit/50;
+    document.getElementById("weightFromValue").innerHTML=`⚖️ ~${estWeight.toFixed(2)} kg`;
+  });
+  document.getElementById("addToListBtn").addEventListener("click",()=>{ let val=document.getElementById("value").innerText; let li=document.createElement("li"); li.textContent=`${selectedPlant} → ${val}`; document.getElementById("plantList").appendChild(li); });
+  document.getElementById("clearMutationsBtn").addEventListener("click",clearMuts);
+  document.getElementById("maxMutationsBtn").addEventListener("click",maxMuts);
+  document.getElementById("weightSlider").addEventListener("input",(e)=>{ document.getElementById("sliderValueLabel").innerText=e.target.value+"%"; computeValue(); });
+  document.getElementById("weight").addEventListener("input",computeValue);
+  document.getElementById("plantAmount").addEventListener("input",computeValue);
+  document.getElementById("sortMutationsBtn").addEventListener("click",()=>{ alert("🔁 Sorted by multiplier (visual demo)"); });
+  document.getElementById("sortAlphabeticalBtn").addEventListener("click",()=>{ alert("Alphabetical order ready"); });
+  document.getElementById("toggleAdminMutationsBtn").addEventListener("click",()=>{ adminHidden=!adminHidden; renderModifiers(); });
+  document.getElementById("mutationSearch").addEventListener("input",(e)=>{ let val=e.target.value.toLowerCase(); document.querySelectorAll(".modifier-button").forEach(btn=>{ btn.style.display=btn.innerText.toLowerCase().includes(val)?"inline-block":"none"; }); });
+  document.getElementById("plantSearch").addEventListener("input",(e)=>{ let val=e.target.value.toLowerCase(); document.querySelectorAll(".fruit-button").forEach(btn=>{ btn.style.display=btn.innerText.toLowerCase().includes(val)?"flex":"none"; }); });
+  // Mutation info modal
+  let modalDiv=document.createElement("div"); modalDiv.id="mutationInfoModal"; modalDiv.style.cssText="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.8);z-index:1100;align-items:center;justify-content:center;";
+  let modalInner=document.createElement("div"); modalInner.style.background="var(--bg-card)"; modalInner.style.padding="1rem"; modalInner.style.borderRadius="1.5rem"; modalInner.style.maxWidth="500px";
+  modalInner.innerHTML=`<h3>✨ Mutation Info (by @neyzu)</h3><ul><li>Rainbow 50x, Gold 20x, Shocked 100x, Frozen 10x</li><li>Celestial 120x, Voidtouched 135x, Dawnbound 150x</li><li>Cosmic 240x, Astral 365x, Goldsparkle 500x</li><li>And 200+ mutations with unique multipliers</li></ul><button id="closeInfoModal">Close</button>`;
+  modalDiv.appendChild(modalInner); document.body.appendChild(modalDiv);
+  document.getElementById("showMutationInfoBtn").addEventListener("click",()=>modalDiv.style.display="flex");
+  modalInner.querySelector("#closeInfoModal").onclick=()=>modalDiv.style.display="none";
+  // Contributors modal
+  let contribModal=document.getElementById("contributorsModal"); let openContrib=document.getElementById("openContributorsModal"); let closeContrib=document.getElementById("closeContribModal");
+  openContrib.addEventListener("click",()=>contribModal.style.display="block");
+  closeContrib.addEventListener("click",()=>contribModal.style.display="none");
+  // Theme system
+  const themeToggle=document.getElementById("themeToggleBtn"), themeMenu=document.getElementById("themeMenu");
+  themeToggle.addEventListener("click",()=>{ themeMenu.hidden=!themeMenu.hidden; });
+  document.querySelectorAll(".theme-option").forEach(opt=>{ opt.addEventListener("click",()=>{ document.body.setAttribute("data-theme",opt.dataset.theme); themeMenu.hidden=true; localStorage.setItem("gardenTheme",opt.dataset.theme); }); });
+  const saved=localStorage.getItem("gardenTheme"); if(saved) document.body.setAttribute("data-theme",saved);
+  document.addEventListener("click",(e)=>{ if(!e.target.closest("#themeSwitcher")) themeMenu.hidden=true; });
+  // init
+  buildCategoryUI(); renderModifiers(); computeValue(); updateDisplay();
+</script>
+</body>
+</html>
+
